@@ -8,7 +8,7 @@ import { ToDo } from '../todoList/types';
 const TodoList: React.FC = () => {
   const dispatch = useAppDispatch();
   const todos = useAppSelector((state: RootState) =>
-    getVisibleTodos(state.todos, state.visibilityFilter)
+    getVisibleTodos(state.todos.toDos, state.visibilityFilter)
   );
 
   return (

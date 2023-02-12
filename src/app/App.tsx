@@ -3,7 +3,11 @@ import AddToDo from '../features/todoList/AddToDo';
 import Footer from '../features/visibilityFilter/Footer';
 import { useEffect } from 'react';
 import { useAppDispatch } from './hooks';
-import { createTodoList, loadTodos } from '../features/todoList/todoSlice';
+import {
+  createTodoList,
+  loadTodos,
+  loadTodosStart,
+} from '../features/todoList/todoSlice';
 
 function App() {
   const dispatch = useAppDispatch();
@@ -12,6 +16,7 @@ function App() {
       dispatch(createTodoList());
     } else {
       dispatch(loadTodos());
+      dispatch(loadTodosStart());
     }
   }, [dispatch]);
   return (

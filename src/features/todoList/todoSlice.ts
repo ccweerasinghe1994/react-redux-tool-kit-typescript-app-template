@@ -4,28 +4,42 @@ import { AppDispatch, AppThunk } from '../../app/store';
 import { ToDo } from '../../features/todoList/types';
 import { RootState } from '../../app/store';
 import { writeTodos, readTodos as fetchTodos } from '../../api/JsonStore';
-const initialState: ToDo[] = [];
+interface initialStateInterface {
+  toDos: ToDo[];
+  error: null | string;
+  loading: boolean;
+}
+const initialState = {
+  error: null,
+  toDos: [],
+  loading: false,
+} as initialStateInterface;
 
 const todoSlice = createSlice({
   name: 'todos',
   initialState,
   reducers: {
     receiveToDos(state, action: PayloadAction<ToDo[]>) {
-      return action.payload;
+      state.toDos = action.payload;
+      return state.toDos;
     },
     receiveTodo(state, action: PayloadAction<ToDo>) {
-      state.push(action.payload);
+      state.toDos.push(action.payload);
     },
     toggleToDo(state, action: PayloadAction<ToDo>) {
-      let todo = state.find((todo) => todo.id === action.payload.id);
+      let todo = state.toDos.find((todo) => todo.id === action.payload.id);
       if (todo) {
         todo.completed = !todo.completed;
       }
     },
+    loadTodosStart: (state) => {
+      state.loading = true;
+    },
   },
 });
 
-export const { toggleToDo } = todoSlice.actions;
+export const { toggleToDo, receiveToDos, receiveTodo, loadTodosStart } =
+  todoSlice.actions;
 
 export const createTodoList = (): AppThunk => async (dispatch: AppDispatch) => {
   const id = Math.random().toString(36).substr(2, 9);
@@ -34,7 +48,7 @@ export const createTodoList = (): AppThunk => async (dispatch: AppDispatch) => {
 
 export const loadTodos = (): AppThunk => async (dispatch: AppDispatch) => {
   const todos = await fetchTodos();
-  dispatch(todoSlice.actions.receiveToDos(todos));
+  dispatch(receiveToDos(todos));
 };
 export const addToDo =
   (text: string): AppThunk =>
@@ -45,7 +59,7 @@ export const addToDo =
       text: text,
     };
 
-    dispatch(todoSlice.actions.receiveTodo(newToDo));
-    writeTodos(getState().todos);
+    dispatch(receiveTodo(newToDo));
+    writeTodos(getState().todos.toDos);
   };
 export default todoSlice.reducer;
